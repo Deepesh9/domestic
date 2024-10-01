@@ -4,13 +4,22 @@ dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors"; // Import cors
-import reportRoutes from "./routes/Creport.route.js"; // Correct import for Creport route
-import deviceInfoRoutes from "./routes/CdeviceInfo.route.js"; // Add routes for device info
-import transactionRoutes from "./routes/Ctransaction.route.js"; // Add routes for transaction
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from 'url';
 
+// Importing routes
+import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
+import cdevicesRoutes from "./routes/Cdevices.route.js";
+import customerRoutes from "./routes/Customer.route.js";
+import devicesRoutes from "./routes/Devices.route.js";
+import ldevicesRoutes from "./routes/Ldevices.route.js";
+import planRoutes from "./routes/Plan.route.js";
+import adminRoutes from "./routes/Admin.route.js";
+import transactionRoutes from "./Routes/Transaction.route.js";
+
+// MongoDB URI and JWT Secret
 const mongodbUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/domestic';
 const jwtSecret = '6f9e76f86d325b506e891130ad7fb84f81a263c44a1d0b3bceb6b28ea53c9334';
 
@@ -19,6 +28,7 @@ if (!jwtSecret) {
     process.exit(1);
 }
 
+// MongoDB Connection
 mongoose.connect(mongodbUri)
     .then(() => {
         console.log("Succeeded to connect to MongoDB 🚀");
@@ -32,6 +42,7 @@ const __dirname = path.dirname(__filename);
 // Define the path to the client build directory
 const clientBuildPath = path.join(__dirname, '../client/dist');
 
+// Initialize Express
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -44,9 +55,15 @@ app.use(cors({
 }));
 
 // Use imported routes
-app.use('/api/reports', reportRoutes);
-app.use('/api/deviceinfo', deviceInfoRoutes); // Add device info route
-app.use('/api/transactions', transactionRoutes); // Add transaction route
+app.use('/api/cdevices', cdevicesRoutes); // Route for Cdevices
+app.use('/api/customers', customerRoutes); // Route for Customers
+app.use('/api/devices', devicesRoutes); // Route for Devices
+app.use('/api/ldevices', ldevicesRoutes); // Route for Ldevices
+app.use('/api/plans', planRoutes); // Route for Plans
+app.use('/api/admins', adminRoutes); // Route for Admins
+app.use('/api/transactions', transactionRoutes); // Route for Transactions
+app.use('/api/user', userRoutes);
+app.use('/api/auth', authRoutes);
 
 // Serve static files from the client build directory
 app.use(express.static(clientBuildPath));
@@ -69,6 +86,7 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Define the PORT and start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is listening on PORT http://localhost:${PORT}`);
